@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ChartBarIcon, UsersIcon, ClockIcon, CheckCircleIcon } from './icons';
+import { 
+  ChartBarIcon, 
+  UsersIcon, 
+  ClockIcon, 
+  CheckCircleIcon, 
+  BookOpenIcon,
+  RefreshIcon,
+  AlertTriangleIcon,
+  ActivityIcon,
+  TargetIcon
+} from './icons';
 
 interface StudentProgress {
   id: number;
@@ -58,9 +68,9 @@ const AnalyticsDashboard: React.FC = () => {
       'at-risk': 'bg-red-500/20 text-red-400 border-red-500/30'
     };
     const labels = {
-      active: '✅ Activo',
-      inactive: '⏸️ Inactivo',
-      'at-risk': '⚠️ En Riesgo'
+      active: <span className="flex items-center gap-1"><CheckCircleIcon className="w-3 h-3" strokeWidth={1.5} /> Activo</span>,
+      inactive: 'Inactivo',
+      'at-risk': <span className="flex items-center gap-1"><AlertTriangleIcon className="w-3 h-3" strokeWidth={1.5} /> En Riesgo</span>
     };
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-medium border ${styles[status as keyof typeof styles]}`}>
@@ -93,14 +103,18 @@ const AnalyticsDashboard: React.FC = () => {
       <div className="bg-gray-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold mb-2">📊 Panel de Analíticas</h2>
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <ChartBarIcon className="w-7 h-7 text-blue-400" strokeWidth={1.5} />
+              Panel de Analíticas
+            </h2>
             <p className="text-gray-400">Monitorea el progreso y rendimiento de tus estudiantes</p>
           </div>
           <button
             onClick={fetchAnalytics}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
           >
-            🔄 Actualizar
+            <RefreshIcon className="w-5 h-5" strokeWidth={1.5} />
+            Actualizar
           </button>
         </div>
 
@@ -124,11 +138,12 @@ const AnalyticsDashboard: React.FC = () => {
           </button>
           <button
             onClick={() => setFilter('at-risk')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
               filter === 'at-risk' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'
             }`}
           >
-            ⚠️ En Riesgo
+            <AlertTriangleIcon className="w-4 h-4" strokeWidth={1.5} />
+            En Riesgo
           </button>
         </div>
       </div>
@@ -177,7 +192,10 @@ const AnalyticsDashboard: React.FC = () => {
 
       {/* Tabla de Progreso de Estudiantes */}
       <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-xl font-bold mb-4">👥 Progreso Individual</h3>
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <UsersIcon className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
+          Progreso Individual
+        </h3>
         
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -249,7 +267,10 @@ const AnalyticsDashboard: React.FC = () => {
 
       {/* Analíticas por Lección */}
       <div className="bg-gray-800 rounded-xl p-6">
-        <h3 className="text-xl font-bold mb-4">📚 Rendimiento por Lección</h3>
+        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <BookOpenIcon className="w-6 h-6 text-green-400" strokeWidth={1.5} />
+          Rendimiento por Lección
+        </h3>
         
         <div className="space-y-4">
           {lessonsAnalytics.map(lesson => (

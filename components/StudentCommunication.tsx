@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { BellIcon, PlusIcon, PencilIcon, TrashIcon, EyeIcon, EyeSlashIcon, SendIcon, CheckCircleIcon, ClockIcon } from './icons';
+import { 
+  BellIcon, 
+  PlusIcon, 
+  PencilIcon, 
+  TrashIcon, 
+  EyeIcon, 
+  EyeSlashIcon, 
+  SendIcon, 
+  CheckCircleIcon, 
+  ClockIcon,
+  MegaphoneIcon,
+  MessageSquareIcon,
+  AlertCircleIcon,
+  AlertTriangleIcon,
+  GraduationCapIcon,
+  BookOpenIcon,
+  SettingsIcon,
+  FileTextIcon,
+  UserIcon,
+  CalendarIcon
+} from './icons';
+import { Circle as CircleDotIcon } from 'lucide-react';
 
 interface Announcement {
   id: number;
@@ -284,24 +305,41 @@ const StudentCommunication: React.FC = () => {
   };
 
   const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      general: '💬 General',
-      lesson: '📚 Lección',
-      technical: '⚙️ Técnico',
-      other: '📋 Otro'
+    const categories: Record<string, { icon: React.ComponentType<any>, label: string }> = {
+      general: { icon: MessageSquareIcon, label: 'General' },
+      lesson: { icon: BookOpenIcon, label: 'Lección' },
+      technical: { icon: SettingsIcon, label: 'Técnico' },
+      other: { icon: FileTextIcon, label: 'Otro' }
     };
-    return labels[category] || category;
+    
+    const config = categories[category];
+    if (!config) return category;
+    
+    const Icon = config.icon;
+    return (
+      <span className="flex items-center gap-1">
+        <Icon className="w-3 h-3" strokeWidth={1.5} />
+        {config.label}
+      </span>
+    );
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'bg-red-500/10 text-red-400 border-red-500/30';
-      case 'low':
-        return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
-      default:
-        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
-    }
+  const getPriorityBadge = (priority: string) => {
+    const priorities: Record<string, { icon: React.ComponentType<any>, color: string, label: string }> = {
+      high: { icon: AlertCircleIcon, color: 'red', label: 'Alta Prioridad' },
+      normal: { icon: AlertTriangleIcon, color: 'yellow', label: 'Normal' },
+      low: { icon: CircleDotIcon, color: 'blue', label: 'Baja' }
+    };
+    
+    const config = priorities[priority] || priorities.normal;
+    const Icon = config.icon;
+    
+    return (
+      <span className={`px-3 py-1 bg-${config.color}-500/10 text-${config.color}-400 border border-${config.color}-500/30 text-xs rounded-full flex items-center gap-1`}>
+        <Icon className="w-3 h-3" strokeWidth={1.5} />
+        {config.label}
+      </span>
+    );
   };
 
   const getPriorityLabel = (priority: string) => {
@@ -351,13 +389,14 @@ const StudentCommunication: React.FC = () => {
         <div className="flex gap-2 bg-gray-800 rounded-lg p-1">
           <button
             onClick={() => setActiveTab('announcements')}
-            className={`px-4 py-2 rounded-md transition-colors font-medium ${
+            className={`px-4 py-2 rounded-md transition-colors font-medium flex items-center gap-2 ${
               activeTab === 'announcements'
                 ? 'bg-blue-600 text-white'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            📢 Anuncios
+            <MegaphoneIcon className="w-4 h-4" strokeWidth={1.5} />
+            Anuncios
           </button>
           <button
             onClick={() => setActiveTab('messages')}
@@ -367,7 +406,8 @@ const StudentCommunication: React.FC = () => {
                 : 'text-gray-400 hover:text-white'
             }`}
           >
-            💬 Mensajes
+            <MessageSquareIcon className="w-4 h-4" strokeWidth={1.5} />
+            Mensajes
             {pendingMessagesCount > 0 && (
               <span className="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {pendingMessagesCount}
@@ -455,9 +495,9 @@ const StudentCommunication: React.FC = () => {
                       }
                       className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="low">🔵 Baja</option>
-                      <option value="normal">🟡 Normal</option>
-                      <option value="high">🔴 Alta</option>
+                      <option value="low">Baja Prioridad</option>
+                      <option value="normal">Prioridad Normal</option>
+                      <option value="high">Alta Prioridad</option>
                     </select>
                   </div>
 
@@ -521,16 +561,11 @@ const StudentCommunication: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-xl font-bold text-white">{announcement.title}</h3>
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
-                            announcement.priority
-                          )}`}
-                        >
-                          {getPriorityLabel(announcement.priority)}
-                        </span>
+                        {getPriorityBadge(announcement.priority)}
                         {!announcement.published && (
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
-                            📝 Borrador
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 flex items-center gap-1">
+                            <PencilIcon className="w-3 h-3" strokeWidth={1.5} />
+                            Borrador
                           </span>
                         )}
                       </div>
@@ -615,8 +650,9 @@ const StudentCommunication: React.FC = () => {
                       {getStatusBadge(msg.status)}
                       <span className="text-sm text-gray-500">{getCategoryLabel(msg.category)}</span>
                     </div>
-                    <p className="text-sm text-gray-400">
-                      👤 {msg.student.name} • 📅 {formatDate(msg.createdAt)}
+                    <p className="text-sm text-gray-400 flex items-center gap-2">
+                      <UserIcon className="w-3 h-3" strokeWidth={1.5} /> {msg.student.name} • 
+                      <CalendarIcon className="w-3 h-3" strokeWidth={1.5} /> {formatDate(msg.createdAt)}
                     </p>
                   </div>
                   {user?.role === 'PROFESSOR' && (

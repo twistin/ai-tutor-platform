@@ -231,6 +231,11 @@ export {
   Zap as ZapIcon,
   Radio as RadioIcon,
   Sparkles as SparklesIcon,
+  
+  // Dashboard específicos
+  LayoutDashboard as LayoutDashboardIcon,
+  FilePlus as FilePlusIcon,
+  Megaphone as MegaphoneIcon,
 } from 'lucide-react';
 
 // Aliases adicionales para compatibilidad con código existente

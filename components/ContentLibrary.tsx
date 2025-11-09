@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { FolderIcon, PlusIcon, TrashIcon, DownloadIcon, SearchIcon } from './icons';
+import { 
+  FolderIcon, 
+  PlusIcon, 
+  TrashIcon, 
+  DownloadIcon, 
+  SearchIcon,
+  FileTextIcon,
+  ImageIcon,
+  CodeIcon,
+  LinkIcon,
+  VideoIcon,
+  LibraryIcon,
+  CalendarIcon,
+  ExternalLinkIcon
+} from './icons';
 
 interface Resource {
   id: number;
@@ -97,14 +111,15 @@ const ContentLibrary: React.FC = () => {
   };
 
   const getTypeIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      pdf: '📄',
-      image: '🖼️',
-      code: '💻',
-      link: '🔗',
-      video: '🎥'
+    const icons: Record<string, React.ComponentType<any>> = {
+      pdf: FileTextIcon,
+      image: ImageIcon,
+      code: CodeIcon,
+      link: LinkIcon,
+      video: VideoIcon
     };
-    return icons[type] || '📁';
+    const Icon = icons[type] || FolderIcon;
+    return <Icon className="w-5 h-5" strokeWidth={1.5} />;
   };
 
   const getTypeColor = (type: string) => {
@@ -131,7 +146,10 @@ const ContentLibrary: React.FC = () => {
       <div className="bg-gray-800 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold mb-2">📚 Biblioteca de Contenidos</h2>
+            <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <LibraryIcon className="w-7 h-7 text-purple-400" strokeWidth={1.5} />
+              Biblioteca de Contenidos
+            </h2>
             <p className="text-gray-400">Administra todos tus recursos y materiales educativos</p>
           </div>
           <button
@@ -225,11 +243,25 @@ const ContentLibrary: React.FC = () => {
 
             {/* Metadata */}
             <div className="text-xs text-gray-500 mb-3 space-y-1">
-              <p>📁 Categoría: {resource.category}</p>
-              {resource.size && <p>💾 Tamaño: {resource.size}</p>}
-              <p>📅 Subido: {new Date(resource.uploadDate).toLocaleDateString('es-ES')}</p>
+              <p className="flex items-center gap-1">
+                <FolderIcon className="w-3 h-3" strokeWidth={1.5} />
+                Categoría: {resource.category}
+              </p>
+              {resource.size && (
+                <p className="flex items-center gap-1">
+                  <FileTextIcon className="w-3 h-3" strokeWidth={1.5} />
+                  Tamaño: {resource.size}
+                </p>
+              )}
+              <p className="flex items-center gap-1">
+                <CalendarIcon className="w-3 h-3" strokeWidth={1.5} />
+                Subido: {new Date(resource.uploadDate).toLocaleDateString('es-ES')}
+              </p>
               {resource.lessonIds.length > 0 && (
-                <p>🔗 Usado en {resource.lessonIds.length} lección(es)</p>
+                <p className="flex items-center gap-1">
+                  <LinkIcon className="w-3 h-3" strokeWidth={1.5} />
+                  Usado en {resource.lessonIds.length} lección(es)
+                </p>
               )}
             </div>
 

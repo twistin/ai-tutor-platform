@@ -4,6 +4,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { mockLogin } from '../services/mockAPIService';
 import { DEMO_CREDENTIALS } from '../constants';
 import ThemeToggle from '../components/ThemeToggle';
+import { GraduationCapIcon, BookOpenIcon, ArrowLeftIcon, LogInIcon } from '../components/icons';
 
 const LoginScreen: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -46,6 +47,17 @@ const LoginScreen: React.FC = () => {
       </div>
 
       <div className="w-full max-w-2xl p-8 space-y-6">
+        {/* Back to Home Link */}
+        <div className="text-center mb-6">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+          >
+            <ArrowLeftIcon className="w-4 h-4 group-hover:-translate-x-1 transition-transform" strokeWidth={1.5} />
+            <span>Volver al inicio</span>
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block mb-4">
@@ -54,7 +66,10 @@ const LoginScreen: React.FC = () => {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">AI Python Tutor</h1>
             </div>
           </Link>
-          <p className="text-gray-700 dark:text-gray-300">Inicia sesión para comenzar tu aprendizaje</p>
+          <div className="flex items-center justify-center gap-2 text-gray-700 dark:text-gray-300">
+            <LogInIcon className="w-5 h-5" strokeWidth={1.5} />
+            <p>Selecciona tu tipo de acceso para comenzar</p>
+          </div>
         </div>
 
         {/* Quick Access Cards */}
@@ -62,29 +77,37 @@ const LoginScreen: React.FC = () => {
           <button
             onClick={() => handleQuickLogin('estudiante')}
             disabled={isLoading}
-            className="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 text-left shadow-xl"
+            className="bg-gradient-to-br from-blue-600 to-blue-800 p-6 rounded-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 text-left shadow-xl group"
           >
-            <div className="text-4xl mb-3">👨‍🎓</div>
-            <h3 className="text-xl font-bold text-white mb-2">Acceso Estudiante</h3>
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-white/20 p-3 rounded-full group-hover:scale-110 transition-transform">
+                <BookOpenIcon className="w-8 h-8 text-white" strokeWidth={1.5} />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 text-center">Acceso Estudiante</h3>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-sm text-blue-100 mb-1">Usuario:</p>
               <p className="text-lg font-mono font-bold text-white">estudiante</p>
             </div>
-            <p className="text-sm text-blue-100">Click para acceso rápido</p>
+            <p className="text-sm text-blue-100 text-center">Click para acceso rápido →</p>
           </button>
 
           <button
             onClick={() => handleQuickLogin('profesor')}
             disabled={isLoading}
-            className="bg-gradient-to-br from-purple-600 to-purple-800 p-6 rounded-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 text-left shadow-xl"
+            className="bg-gradient-to-br from-purple-600 to-purple-800 p-6 rounded-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 text-left shadow-xl group"
           >
-            <div className="text-4xl mb-3">👨‍🏫</div>
-            <h3 className="text-xl font-bold text-white mb-2">Acceso Profesor</h3>
+            <div className="flex items-center justify-center mb-4">
+              <div className="bg-white/20 p-3 rounded-full group-hover:scale-110 transition-transform">
+                <GraduationCapIcon className="w-8 h-8 text-white" strokeWidth={1.5} />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2 text-center">Acceso Profesor</h3>
             <div className="bg-white/20 rounded-lg p-3 mb-3">
               <p className="text-sm text-purple-100 mb-1">Usuario:</p>
               <p className="text-lg font-mono font-bold text-white">profesor</p>
             </div>
-            <p className="text-sm text-purple-100">Click para acceso rápido</p>
+            <p className="text-sm text-purple-100 text-center">Click para acceso rápido →</p>
           </button>
         </div>
 

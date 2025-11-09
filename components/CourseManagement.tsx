@@ -4,6 +4,16 @@ import LessonEditor, { LessonData, ContentBlock } from './LessonEditor';
 import { Course, Module, Lesson } from '../types';
 import { getCourses, createCourse, deleteCourse, addModuleToCourse, addLessonToModule } from '../services/mockAPIService';
 import {
+  BookOpenIcon,
+  PencilIcon,
+  CopyIcon,
+  TrashIcon,
+  PlusIcon,
+  FolderIcon,
+  FileTextIcon,
+  ClockIcon
+} from './icons';
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -76,27 +86,28 @@ const SortableModule: React.FC<{
             className="px-2 py-1 bg-yellow-600 dark:bg-yellow-500 text-white text-xs rounded hover:bg-yellow-700 dark:hover:bg-yellow-600"
             title="Editar módulo"
           >
-            ✏️
+            <PencilIcon className="w-3 h-3" strokeWidth={1.5} />
           </button>
           <button
             onClick={onDuplicate}
             className="px-2 py-1 bg-blue-600 dark:bg-blue-500 text-white text-xs rounded hover:bg-blue-700 dark:hover:bg-blue-600"
             title="Duplicar módulo"
           >
-            📋
+            <CopyIcon className="w-3 h-3" strokeWidth={1.5} />
           </button>
           <button
             onClick={onDelete}
             className="px-2 py-1 bg-red-600 dark:bg-red-500 text-white text-xs rounded hover:bg-red-700 dark:hover:bg-red-600"
             title="Eliminar módulo"
           >
-            🗑️
+            <TrashIcon className="w-3 h-3" strokeWidth={1.5} />
           </button>
           <button
             onClick={onAddLesson}
-            className="px-3 py-1 bg-purple-600 dark:bg-purple-500 text-white text-sm rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors"
+            className="px-3 py-1 bg-purple-600 dark:bg-purple-500 text-white text-sm rounded-md hover:bg-purple-700 dark:hover:bg-purple-600 transition-colors flex items-center gap-1"
           >
-            + Lección
+            <PlusIcon className="w-4 h-4" strokeWidth={1.5} />
+            Lección
           </button>
         </div>
       </div>
@@ -125,21 +136,21 @@ const SortableModule: React.FC<{
                   className="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700"
                   title="Editar lección"
                 >
-                  ✏️
+                  <PencilIcon className="w-3 h-3" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => onDuplicateLesson(lesson)}
                   className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
                   title="Duplicar lección"
                 >
-                  📋
+                  <CopyIcon className="w-3 h-3" strokeWidth={1.5} />
                 </button>
                 <button
                   onClick={() => onDeleteLesson(lesson.id)}
                   className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
                   title="Eliminar lección"
                 >
-                  🗑️
+                  <TrashIcon className="w-3 h-3" strokeWidth={1.5} />
                 </button>
               </div>
             </div>
@@ -487,16 +498,20 @@ const CourseManagement: React.FC = () => {
       {/* Header con búsqueda */}
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">📚 Gestión de Cursos</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <BookOpenIcon className="w-7 h-7 text-blue-400" strokeWidth={1.5} />
+            Gestión de Cursos
+          </h2>
           <button 
             onClick={() => {
               setEditMode('create');
               setCourseForm({ title: '', description: '', level: 'beginner', duration: '' });
               setIsModalOpen(true);
             }} 
-            className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-semibold"
+            className="px-6 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-semibold flex items-center gap-2"
           >
-            + Crear Curso
+            <PlusIcon className="w-5 h-5" strokeWidth={1.5} />
+            Crear Curso
           </button>
         </div>
         
@@ -544,13 +559,16 @@ const CourseManagement: React.FC = () => {
                   <p className="text-gray-600 dark:text-gray-400 mt-2">{course.description}</p>
                   <div className="flex gap-6 mt-4 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1">
-                      📖 <strong>{course.modules.length}</strong> módulos
+                      <FolderIcon className="w-4 h-4" strokeWidth={1.5} />
+                      <strong>{course.modules.length}</strong> módulos
                     </span>
                     <span className="flex items-center gap-1">
-                      📝 <strong>{course.modules.reduce((acc, m) => acc + m.lessons.length, 0)}</strong> lecciones
+                      <FileTextIcon className="w-4 h-4" strokeWidth={1.5} />
+                      <strong>{course.modules.reduce((acc, m) => acc + m.lessons.length, 0)}</strong> lecciones
                     </span>
                     <span className="flex items-center gap-1">
-                      ⏱️ {course.duration}
+                      <ClockIcon className="w-4 h-4" strokeWidth={1.5} />
+                      {course.duration}
                     </span>
                   </div>
                 </div>
@@ -631,7 +649,8 @@ const CourseManagement: React.FC = () => {
 
         {filteredCourses.length === 0 && (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            <p className="text-xl mb-2">📚 No hay cursos creados</p>
+            <BookOpenIcon className="w-16 h-16 mx-auto mb-4 opacity-50" strokeWidth={1.5} />
+            <p className="text-xl mb-2">No hay cursos creados</p>
             <p className="text-sm">Crea tu primer curso haciendo click en el botón de arriba</p>
           </div>
         )}
