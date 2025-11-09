@@ -49,6 +49,133 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 
+// 🚨 ENDPOINT TEMPORAL - Inicializar usuarios y datos (eliminar después de usar)
+app.post('/api/init-users', async (req: Request, res: Response) => {
+  try {
+    console.log('🔧 Inicializando usuarios y datos iniciales...');
+
+    // Crear usuarios
+    const student = await prisma.user.create({
+      data: {
+        id: 1,
+        email: 'estudiante@test.com',
+        password: 'password123', // En producción real, usar hash
+        role: 'STUDENT',
+        name: 'Estudiante Demo',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    const professor = await prisma.user.create({
+      data: {
+        id: 2,
+        email: 'profesor@test.com',
+        password: 'password123', // En producción real, usar hash
+        role: 'PROFESSOR',
+        name: 'Profesor Demo',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    // Crear módulo inicial
+    const module1 = await prisma.module.create({
+      data: {
+        title: 'Introducción a Python',
+        order: 1,
+        published: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    // Crear lecciones
+    await prisma.lesson.create({
+      data: {
+        moduleId: module1.id,
+        title: 'Variables y Tipos de Datos',
+        content: '# Variables en Python\n\nUna variable es un espacio en memoria donde guardamos información...',
+        order: 1,
+        published: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    await prisma.lesson.create({
+      data: {
+        moduleId: module1.id,
+        title: 'Operadores Básicos',
+        content: '# Operadores en Python\n\nLos operadores nos permiten realizar operaciones con variables...',
+        order: 2,
+        published: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    await prisma.lesson.create({
+      data: {
+        moduleId: module1.id,
+        title: 'Estructuras de Control',
+        content: '# Estructuras de Control\n\nLas estructuras de control nos permiten tomar decisiones...',
+        order: 3,
+        published: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    // Crear anuncios
+    await prisma.announcement.create({
+      data: {
+        title: '¡Bienvenidos a la Plataforma!',
+        message: 'Estamos emocionados de tenerte aquí. Comienza explorando las lecciones disponibles.',
+        priority: 'high',
+        published: true,
+        professorId: professor.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    await prisma.announcement.create({
+      data: {
+        title: 'Nuevo Módulo Disponible',
+        message: 'Ya está disponible el módulo de Introducción a Python. ¡No te lo pierdas!',
+        priority: 'normal',
+        published: true,
+        professorId: professor.id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    });
+
+    console.log('✅ Usuarios y datos iniciales creados exitosamente');
+
+    res.json({
+      success: true,
+      message: 'Usuarios y datos iniciales creados exitosamente',
+      users: [
+        { email: student.email, role: student.role },
+        { email: professor.email, role: professor.role }
+      ],
+      module: module1.title,
+      lessonsCount: 3,
+      announcementsCount: 2
+    });
+
+  } catch (error) {
+    console.error('❌ Error al inicializar usuarios:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Error al crear usuarios iniciales',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // Ruta de health check
 app.get('/health', (req: Request, res: Response) => {
   res.json({ 
