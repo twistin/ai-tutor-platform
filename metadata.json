@@ -1,0 +1,5 @@
+{
+  "name": "AI Python Tutor",
+  "description": "An interactive platform for 15-year-olds to learn Python, powered by Gemini. The course structure is dynamically generated and explained by AI to create a personalized learning journey.",
+  "requestFramePermissions": []
+}

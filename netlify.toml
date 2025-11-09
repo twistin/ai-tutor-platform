@@ -1,0 +1,28 @@
+# Configuración de Netlify para AI Python Tutor
+
+[build]
+  # Comando para construir la aplicación
+  command = "npm run build"
+  # Directorio donde se genera el build
+  publish = "dist"
+
+# Redirecciones para React Router (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers de seguridad
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache para assets estáticos
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

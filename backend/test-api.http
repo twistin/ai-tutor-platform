@@ -1,0 +1,42 @@
+### Test: Health Check
+GET http://localhost:8080/health
+
+### Test: Root Endpoint
+GET http://localhost:8080/
+
+### Test: Complete Lesson (Crear nuevo progreso)
+POST http://localhost:8080/api/progress/complete
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "lessonId": 1,
+  "lastSubmittedCode": "print('¡Hola Mundo!')"
+}
+
+### Test: Complete Lesson (Actualizar progreso existente)
+POST http://localhost:8080/api/progress/complete
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "lessonId": 1,
+  "lastSubmittedCode": "print('¡Hola Mundo desde Python!')\nprint('Segunda línea')"
+}
+
+### Test: Error - Missing userId
+POST http://localhost:8080/api/progress/complete
+Content-Type: application/json
+
+{
+  "lessonId": 1
+}
+
+### Test: Error - Invalid userId type
+POST http://localhost:8080/api/progress/complete
+Content-Type: application/json
+
+{
+  "userId": "invalid",
+  "lessonId": 1
+}

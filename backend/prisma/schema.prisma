@@ -1,0 +1,219 @@
+// This is your Prisma schema file
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enum para el rol de usuario
+enum Role {
+  STUDENT
+  PROFESSOR
+}
+
+// Enum para tipos de eventos de actividad
+enum LogEventType {
+  LOGIN
+  LESSON_VIEWED
+  AI_QUERY_ASKED
+  CODE_SUBMITTED
+  QUIZ_ATTEMPTED
+}
+
+// Modelo de Usuario
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  role      Role       @default(STUDENT)
+  name      String?    // Nombre del usuario (opcional)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  
+  // Relación con Progress (un usuario puede tener muchos progresos)
+  progress  Progress[]
+  
+  // Relación con ActivityLog (un usuario puede tener muchos logs de actividad)
+  activityLogs ActivityLog[]
+  
+  // Relaciones con Feedback
+  feedbackAsStudent   Feedback[] @relation("FeedbackToStudent")
+  feedbackAsProfessor Feedback[] @relation("FeedbackToProfessor")
+  
+  // Relación con Announcements (solo profesores pueden crear anuncios)
+  announcements       Announcement[]
+  
+  // Relación con StudentMessages (mensajes enviados por estudiantes)
+  sentMessages        StudentMessage[] @relation("StudentMessages")
+
+  @@map("users")
+}
+
+// Modelo de Módulo
+model Module {
+  id        Int      @id @default(autoincrement())
+  title     String
+  order     Int      // Orden del módulo dentro del curso
+  published Boolean  @default(false) // Si el módulo está publicado o no
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relación con Lesson (un módulo puede tener muchas lecciones)
+  lessons   Lesson[]
+
+  @@map("modules")
+}
+
+// Modelo de Lección
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?  // Contenido en Markdown (opcional, texto largo)
+  published Boolean  @default(false) // Si la lección está publicada o no
+  order     Int      // Orden de la lección dentro del módulo
+  moduleId  Int      // Foreign key al módulo
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relación con Module (muchas lecciones pertenecen a un módulo)
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  // Relación con Progress (una lección puede tener muchos progresos)
+  progress  Progress[]
+  
+  // Relación con Feedback (una lección puede tener muchos feedbacks)
+  feedback  Feedback[]
+
+  @@map("lessons")
+  @@unique([moduleId, order]) // No puede haber dos lecciones con el mismo orden en un módulo
+  @@index([moduleId]) // Índice para búsquedas rápidas por módulo
+}
+
+// Modelo de Progreso (el más importante)
+model Progress {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  lessonId           Int
+  completed          Boolean  @default(false)
+  lastSubmittedCode  String?  // Código enviado por el estudiante (opcional)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // Relaciones
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson  Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  
+  // Relación con Feedback (un progreso puede tener muchos feedbacks)
+  feedback Feedback[]
+
+  @@map("progress")
+  @@unique([userId, lessonId]) // Un usuario solo puede tener un progreso por lección
+  @@index([userId]) // Índice para búsquedas rápidas por usuario
+  @@index([lessonId]) // Índice para búsquedas rápidas por lección
+}
+
+// Modelo de Registro de Actividad
+model ActivityLog {
+  id        Int           @id @default(autoincrement())
+  createdAt DateTime      @default(now())
+  eventType LogEventType  // Tipo de evento (LOGIN, LESSON_VIEWED, etc.)
+  details   String?       // Detalles adicionales en formato JSON (opcional)
+  userId    Int           // Foreign key al usuario
+  
+  // Relación con User (muchos logs pertenecen a un usuario)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activity_logs")
+  @@index([userId]) // Índice para búsquedas rápidas por usuario
+  @@index([eventType]) // Índice para búsquedas por tipo de evento
+  @@index([createdAt]) // Índice para búsquedas por fecha
+}
+
+// Modelo de Feedback (Evaluación del Profesor)
+model Feedback {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Contenido del feedback
+  comment    String   // Comentario del profesor
+  rating     Int?     // Calificación opcional (1-5 estrellas)
+  
+  // Relaciones
+  studentId  Int      // ID del estudiante que recibe el feedback
+  professorId Int     // ID del profesor que da el feedback
+  lessonId   Int      // ID de la lección sobre la que se da feedback
+  progressId Int?     // ID del progreso relacionado (opcional)
+  
+  student    User     @relation("FeedbackToStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  professor  User     @relation("FeedbackToProfessor", fields: [professorId], references: [id], onDelete: Cascade)
+  lesson     Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  progress   Progress? @relation(fields: [progressId], references: [id], onDelete: SetNull)
+
+  @@map("feedback")
+  @@index([studentId]) // Búsquedas por estudiante
+  @@index([professorId]) // Búsquedas por profesor
+  @@index([lessonId]) // Búsquedas por lección
+}
+
+// Modelo de Anuncios/Mensajes (del profesor a estudiantes)
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Contenido del anuncio
+  title       String   // Título del anuncio
+  message     String   // Mensaje/contenido del anuncio
+  priority    String   @default("normal") // "high", "normal", "low"
+  published   Boolean  @default(true) // Si está visible para estudiantes
+  
+  // Relación con el profesor que creó el anuncio
+  professorId Int
+  professor   User     @relation(fields: [professorId], references: [id], onDelete: Cascade)
+  
+  // Opcional: para qué lección/módulo es relevante
+  lessonId    Int?
+  moduleId    Int?
+
+  @@map("announcements")
+  @@index([professorId])
+  @@index([createdAt])
+  @@index([published])
+}
+
+// Modelo de Mensajes/Consultas (de estudiantes a profesores)
+model StudentMessage {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Contenido del mensaje
+  subject     String   // Asunto del mensaje
+  message     String   // Contenido del mensaje
+  category    String   @default("general") // "general", "lesson", "technical", "other"
+  status      String   @default("pending") // "pending", "answered", "closed"
+  
+  // Relación con el estudiante que envió el mensaje
+  studentId   Int
+  student     User     @relation("StudentMessages", fields: [studentId], references: [id], onDelete: Cascade)
+  
+  // Respuesta del profesor (opcional)
+  response    String?
+  respondedAt DateTime?
+  respondedBy Int?
+  
+  // Opcional: relacionado con lección específica
+  lessonId    Int?
+  moduleId    Int?
+
+  @@map("student_messages")
+  @@index([studentId])
+  @@index([status])
+  @@index([createdAt])
+}
